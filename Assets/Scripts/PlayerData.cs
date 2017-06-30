@@ -9,6 +9,8 @@ namespace EpicGameJam
 {
     public class PlayerData : MonoSingleton<PlayerData>
     {
+        public float DecreaseValue;
+
         public float StartValue = 10f;
 
         public List<float> ColorScores = new List<float>();
@@ -25,6 +27,8 @@ namespace EpicGameJam
         {
             for (int i = 0; i < 3; i++)
             {
+                ColorScores[i] -= DecreaseValue*Time.deltaTime;
+
                 PaintRollerManager.instance.UpdateColorValue(i, ColorScores[i]);
             }
         }
