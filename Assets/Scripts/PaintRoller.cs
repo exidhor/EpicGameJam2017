@@ -7,7 +7,6 @@ using Random = UnityEngine.Random;
 
 namespace EpicGameJam
 {
-    [RequireComponent(typeof(Collider2D))]
     public class PaintRoller : MonoBehaviour
     {
         public EColor ColorName;

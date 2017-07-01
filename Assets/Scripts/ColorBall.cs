@@ -30,7 +30,7 @@ namespace EpicGameJam
         {
             if (collider.tag == "Player")
             {
-                PlayerData.instance.AddColorScore((int) ColorName, 5);
+                //PlayerData.instance.AddColorScore((int) ColorName, 5);
 
                 _target = PaintRollerManager.instance.GetPaintRoller(ColorName).gameObject;
             }
