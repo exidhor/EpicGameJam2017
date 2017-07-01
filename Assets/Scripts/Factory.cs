@@ -15,7 +15,7 @@ namespace EpicGameJam
 
         public float Speed;
 
-        public bool CurrentIsUpside = false;
+        //public bool CurrentIsUpside = false;
 
         public Obstacle Obstacle;
         public ColorBall ColorBall;
@@ -33,18 +33,19 @@ namespace EpicGameJam
         public Vector2 TimeObstacleSameSide;
         public float MinTimeObstacleOtherSide;
         public float TimeBetweenColors;
+        public float TimeBetweenObstacleAndColor;
 
-        private float _timeCountObstacleUp = 0;
-        private float _timeCountObstacleDown = 0;
-
-        //private float _timeSinceLastObstacleUp;
-        //private float _timeSinceLastObstacleDown;
+        private float _timeCountUp = 0;
+        private float _timeCountDown = 0;
 
         private float _nextTimeObstacleUp;
         private float _nextTimeObstacleDown;
 
-        private int _colorSequenceCount;
-        private int _currentSequence;
+        private int _colorSequenceCountUp;
+        private int _colorSequenceCountDown;
+
+        private int _currentSequenceIndexUp;
+        private int _currentSequenceIndexDown;
 
         void Start()
         {
@@ -54,20 +55,20 @@ namespace EpicGameJam
 
         void Update()
         {
-            _timeCountObstacleUp += Time.deltaTime;
-            _timeCountObstacleDown += Time.deltaTime;
+            _timeCountUp += Time.deltaTime;
+            _timeCountDown += Time.deltaTime;
 
             bool manageUpFirst = Random.value > 0.5f;
 
             if (manageUpFirst)
             {
-                ManageObstacleUp();
-                ManageObstacleDown();
+                ManageUp();
+                ManageDown();
             }
             else
             {
-                ManageObstacleDown();
-                ManageObstacleUp();
+                ManageDown();
+                ManageUp();
             }
 
             //_currentTime += Time.deltaTime;
@@ -80,16 +81,90 @@ namespace EpicGameJam
             //}
         }
 
+        private void ManageUp()
+        {
+            ManageObstacleUp();
+            ManageColorUp();
+        }
+
+        private void ManageDown()
+        {
+            ManageObstacleDown();
+            ManageColorDown();
+        }
+
+        private void ManageColorUp()
+        {
+            if (_currentSequenceIndexUp < _colorSequenceCountUp
+                && _timeCountUp > TimeBetweenObstacleAndColor + _currentSequenceIndexUp * TimeBetweenColors)
+            {
+                PopColorBall(UpsidePoint);
+                _currentSequenceIndexUp++;
+            }
+        }
+
+        private void ManageColorDown()
+        {
+            if (_currentSequenceIndexDown < _colorSequenceCountDown
+                && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown * TimeBetweenColors)
+            {
+                PopColorBall(DownsidePoint);
+                _currentSequenceIndexDown++;
+            }
+        }
+
+        void SetColorTimeUp()
+        {
+            _currentSequenceIndexUp = 0;
+
+            float distanceBetweenObstacle = _nextTimeObstacleUp - 2*TimeBetweenObstacleAndColor;
+
+            if (distanceBetweenObstacle > 0)
+            {
+                int colorMax = (int)((distanceBetweenObstacle) / TimeBetweenColors) + 1;
+
+                if (colorMax >= ColorSequenceRange.x)
+                {
+                    int maxGeneratedColor = (int)Mathf.Min(colorMax, ColorSequenceRange.y);
+
+                    _colorSequenceCountUp = Random.Range((int)ColorSequenceRange.x, maxGeneratedColor);
+                }
+            }
+            
+            else
+            {
+                _colorSequenceCountUp = 0;
+            }
+        }
+
+        void SetColorTimeDown()
+        {
+            _currentSequenceIndexDown = 0;
+
+            int colorMax = (int)((_nextTimeObstacleDown - 2 * TimeBetweenObstacleAndColor) / TimeBetweenColors);
+
+            if (colorMax >= ColorSequenceRange.x)
+            {
+                int maxGeneratedColor = (int)Mathf.Min(colorMax, ColorSequenceRange.y);
+
+                _colorSequenceCountDown = Random.Range((int)ColorSequenceRange.x, maxGeneratedColor);
+            }
+            else
+            {
+                _colorSequenceCountDown = 0;
+            }
+        }
+
         private void ManageObstacleUp()
         {
-            if (_timeCountObstacleUp > _nextTimeObstacleUp)
+            if (_timeCountUp > _nextTimeObstacleUp)
             {
                 PopObstacle(UpsidePoint);
 
-                _timeCountObstacleUp = 0;
+                _timeCountUp = 0;
 
-                if (_timeCountObstacleDown + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
-                    && _nextTimeObstacleDown - _timeCountObstacleDown - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
+                if (_timeCountDown + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
+                    && _nextTimeObstacleDown - _timeCountDown - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
                 {
                     bool popBetween = Random.value > 0.5f;
 
@@ -99,29 +174,31 @@ namespace EpicGameJam
                     }
                     else
                     {
-                        _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountObstacleDown + MinTimeObstacleOtherSide,
-                                _nextTimeObstacleDown - _timeCountObstacleDown +
+                        _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
+                                _nextTimeObstacleDown - _timeCountDown +
                                 (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                     }
                 }
                 else
                 {
-                    _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountObstacleDown + MinTimeObstacleOtherSide,
-                        _nextTimeObstacleDown - _timeCountObstacleDown +
+                    _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
+                        _nextTimeObstacleDown - _timeCountDown +
                         (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                 }
+
+                SetColorTimeUp();
             }
         }
 
         private void ManageObstacleDown()
         {
-            if (_timeCountObstacleDown > _nextTimeObstacleDown)
+            if (_timeCountDown > _nextTimeObstacleDown)
             {
                 PopObstacle(DownsidePoint);
-                _timeCountObstacleDown = 0;
+                _timeCountDown = 0;
 
-                if (_timeCountObstacleUp + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
-                    && _nextTimeObstacleUp - _timeCountObstacleUp - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
+                if (_timeCountUp + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
+                    && _nextTimeObstacleUp - _timeCountUp - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
                 {
                     bool popBetween = Random.value > 0.5f;
 
@@ -131,17 +208,19 @@ namespace EpicGameJam
                     }
                     else
                     {
-                        _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountObstacleUp + MinTimeObstacleOtherSide,
-                                _nextTimeObstacleUp - _timeCountObstacleUp +
+                        _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountUp + MinTimeObstacleOtherSide,
+                                _nextTimeObstacleUp - _timeCountUp +
                                 (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                     }
                 }
                 else
                 {
-                    _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountObstacleUp + MinTimeObstacleOtherSide,
-                            _nextTimeObstacleUp - _timeCountObstacleUp +
+                    _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountUp + MinTimeObstacleOtherSide,
+                            _nextTimeObstacleUp - _timeCountUp +
                             (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                 }
+
+                SetColorTimeDown();
             }
         }
 
