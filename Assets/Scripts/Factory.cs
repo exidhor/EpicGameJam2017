@@ -38,6 +38,9 @@ namespace EpicGameJam
         public float TimeBetweenColors;
         public float TimeBetweenObstacleAndColor;
 
+        public float MaxDeltaColor;
+        public float MinColorValueForConstraint;
+
         private float _timeCountUp = 0;
         private float _timeCountDown = 0;
 
@@ -102,7 +105,7 @@ namespace EpicGameJam
         {
             Speed += Acceleration*Time.fixedDeltaTime;
 
-            if (Speed > Acceleration)
+            if (Speed > MaxSpeed)
             {
                 Speed = MaxSpeed;
             }
@@ -125,7 +128,18 @@ namespace EpicGameJam
             if (_currentSequenceIndexUp < _colorSequenceCountUp
                 && _timeCountUp > TimeBetweenObstacleAndColor + _currentSequenceIndexUp * TimeBetweenColors)
             {
-                PopColorBall(UpsidePoint);
+                int randomValue;
+
+                if (_currentSequenceIndexUp == 0)
+                {
+                    randomValue = GetColorIndexWithConstraint();
+                }
+                else
+                {
+                    randomValue = Random.Range(0, 3);
+                }
+
+                PopColorBall(UpsidePoint, randomValue);
                 _currentSequenceIndexUp++;
             }
         }
@@ -135,7 +149,9 @@ namespace EpicGameJam
             if (_currentSequenceIndexDown < _colorSequenceCountDown
                 && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown * TimeBetweenColors)
             {
-                PopColorBall(DownsidePoint);
+                int randomValue = Random.Range(0, 3);
+
+                PopColorBall(DownsidePoint, randomValue);
                 _currentSequenceIndexDown++;
             }
         }
@@ -286,7 +302,7 @@ namespace EpicGameJam
             //obstacle.SetSpeed(Speed);
         }
 
-        private void PopColorBall(Transform position)
+        private void PopColorBall(Transform position, int index)
         {
             ColorBall colorBall = Instantiate<ColorBall>(ColorBall);
 
@@ -295,9 +311,11 @@ namespace EpicGameJam
 
             //colorBall.SetSpeed(Speed);
 
-            int randomValue = Random.Range(0, 3);
+            
 
-            colorBall.SetColor(ColorBallManager.instance.ColorList[randomValue]);
+
+
+            colorBall.SetColor(ColorBallManager.instance.ColorList[index]);
         }
 
         //private void SetMaxTime()
@@ -305,5 +323,46 @@ namespace EpicGameJam
         //    _maxTime = Random.Range(TimeRange.x, TimeRange.y);
         //    _currentTime = 0;
         //}
+
+        private int GetColorIndexWithConstraint()
+        {
+            int smallestIndex = 0;
+
+            for (int i = 1; i < 3; i++)
+            {
+                if (PlayerData.instance.ColorScores[i] < PlayerData.instance.ColorScores[smallestIndex])
+                {
+                    smallestIndex = i;
+                }
+            }
+
+
+            if (MinColorValueForConstraint < PlayerData.instance.ColorScores[smallestIndex])
+            {
+                return smallestIndex;
+            }
+
+            int otherSmallestIndex = 0;
+
+            for (int i = 1; i < 3; i++)
+            {
+                if (i != smallestIndex
+                    && PlayerData.instance.ColorScores[i] < PlayerData.instance.ColorScores[otherSmallestIndex])
+                {
+                    otherSmallestIndex = i;
+                }
+            }
+
+            float delta =
+                Mathf.Abs(PlayerData.instance.ColorScores[smallestIndex] -
+                          PlayerData.instance.ColorScores[otherSmallestIndex]);
+
+            if (MaxDeltaColor < delta)
+            {
+                return smallestIndex;
+            }
+
+            return Random.Range(0, 3);
+        }
     }
 }
