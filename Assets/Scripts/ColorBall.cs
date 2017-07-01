@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace EpicGameJam
 {
@@ -11,6 +7,11 @@ namespace EpicGameJam
     {
         private SpriteRenderer _spriteRender;
         public EColor ColorName;
+
+        public bool StartDisapear;
+        public float DisapearSpeed;
+
+        public float TargetDistance;
 
         protected override void Awake()
         {
@@ -30,7 +31,59 @@ namespace EpicGameJam
             if (collider.tag == "Player")
             {
                 PlayerData.instance.AddColorScore((int) ColorName, 5);
-                Destroy(this.gameObject);
+
+                _target = PaintRollerManager.instance.GetPaintRoller(ColorName).gameObject;
+            }
+        }
+
+        void Disapear()
+        {
+            transform.SetParent(_target.transform, true);
+
+            _target = null;
+
+            StartDisapear = true;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (StartDisapear)
+            {
+                Vector3 scale = transform.localScale;
+
+                float decreaseScaleValue = DisapearSpeed*Time.deltaTime;
+
+                scale.x -= decreaseScaleValue;
+                scale.y -= decreaseScaleValue;
+
+                if (scale.x <= 0)
+                {
+                    Destroy(this.gameObject);
+                }
+
+                transform.localScale = scale;
+            }
+        }
+
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (_target != null)
+            {
+                float distance = Vector2.Distance(_target.transform.position, transform.position);
+
+                if (TargetDistance > distance)
+                {
+                    PaintRoller paintRoller = _target.GetComponent<PaintRoller>();
+                    PlayerData.instance.AddColorScore((int)paintRoller.ColorName, 5);
+
+                    _rb.velocity = Vector2.zero;
+
+                    Disapear();
+                }
             }
         }
     }

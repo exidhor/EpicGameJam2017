@@ -5,8 +5,12 @@ namespace EpicGameJam
     [RequireComponent(typeof(Rigidbody2D))]
     public class Movable : MonoBehaviour
     {
-        private Rigidbody2D _rb;
+        protected Rigidbody2D _rb;
         public float Speed;
+
+        public float TargetSpeed;
+
+        protected GameObject _target = null;
 
         private static readonly float MAX_DISTANCE = -14f;
 
@@ -28,6 +32,28 @@ namespace EpicGameJam
             {
                 Destroy(this.gameObject);
             }
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            if (_target != null)
+            {
+                Vector2 direction = _target.transform.position - transform.position;
+
+                direction.Normalize();
+
+                if (direction.magnitude > 0.01f)
+                {
+                    direction *= TargetSpeed;
+
+                    _rb.velocity = direction;
+                }
+            }
+        }
+
+        public void SetTarget(GameObject go)
+        {
+            _target = go;
         }
     }
 }

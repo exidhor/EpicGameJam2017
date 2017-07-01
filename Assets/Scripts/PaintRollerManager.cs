@@ -16,13 +16,18 @@ namespace EpicGameJam
         {
             for (int i = 0; i < 3; i++)
             {
-                _paintRollers[i].SetColor(ColorBallManager.instance.ColorList[i].Color);
+                _paintRollers[i].SetColor(ColorBallManager.instance.ColorList[i]);
             }
         }
 
         public void UpdateColorValue(int index, float value)
         {
             _paintRollers[index].SetSize(value);
+        }
+
+        public PaintRoller GetPaintRoller(EColor colorName)
+        {
+            return _paintRollers[(int) colorName];
         }
     }
 }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace EpicGameJam
 {
-    [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(Collider2D))]
     public class PaintRoller : MonoBehaviour
     {
+        public EColor ColorName;
         [SerializeField]
         private Color _traceColor;
 
@@ -26,11 +28,14 @@ namespace EpicGameJam
         void Awake()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();
+
+            _currentTime = Random.Range(0, speedAnimation);
         }
 
-        public void SetColor(Color color)
+        public void SetColor(ColorEntry colorEntry)
         {
-            Traced.color = color;
+            ColorName = colorEntry.ColorName;
+            Traced.color = colorEntry.Color;
         }
 
         void Update()
@@ -39,7 +44,7 @@ namespace EpicGameJam
 
             if (_currentTime > speedAnimation)
             {
-                _currentTime = 0;
+                _currentTime -= speedAnimation;
                 _currentIndex++;
 
                 if (_currentIndex >= _animation.Count)

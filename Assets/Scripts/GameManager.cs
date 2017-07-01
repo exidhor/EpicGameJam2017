@@ -37,6 +37,8 @@ namespace EpicGameJam
 
         public void StartGame()
         {
+            Time.timeScale = 1;
+
             SceneManager.LoadScene(1);
         }
 
