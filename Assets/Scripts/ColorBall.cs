@@ -29,7 +29,7 @@ namespace EpicGameJam
         {
             if (collider.tag == "Player")
             {
-                PlayerData.instance.ColorScores[(int) ColorName] += 5;
+                PlayerData.instance.AddColorScore((int) ColorName, 5);
                 Destroy(this.gameObject);
             }
         }

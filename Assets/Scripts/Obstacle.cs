@@ -13,7 +13,7 @@ namespace EpicGameJam
         {
             if (collider.tag == "Player")
             {
-                Debug.Log("End game");
+                PlayerData.instance.Collision();
             }
 
             else if (collider.tag == "EndLevel")
