@@ -22,6 +22,7 @@ namespace EpicGameJam
 
         public Obstacle Obstacle;
         public ColorBall ColorBall;
+        public Grass Grass;
 
         //public Vector2 TimeRange;
 
@@ -41,6 +42,8 @@ namespace EpicGameJam
         public float MaxDeltaColor;
         public float MinColorValueForConstraint;
 
+        public Vector2 TimeBetweenGrass;
+
         private float _timeCountUp = 0;
         private float _timeCountDown = 0;
 
@@ -52,6 +55,10 @@ namespace EpicGameJam
 
         private int _currentSequenceIndexUp;
         private int _currentSequenceIndexDown;
+
+        private float _nextGrassTime;
+        private float _currentGrassTime;
+        private bool _nextGrassIsUpside;
 
         private float _startSpeed;
 
@@ -91,6 +98,8 @@ namespace EpicGameJam
                 ManageUp();
             }
 
+            ManageGrass();
+
             //_currentTime += Time.deltaTime;
 
             //if (_currentTime > _maxTime)
@@ -126,7 +135,7 @@ namespace EpicGameJam
         private void ManageColorUp()
         {
             if (_currentSequenceIndexUp < _colorSequenceCountUp
-                && _timeCountUp > TimeBetweenObstacleAndColor + _currentSequenceIndexUp * TimeBetweenColors)
+                && _timeCountUp > TimeBetweenObstacleAndColor + _currentSequenceIndexUp*TimeBetweenColors)
             {
                 int randomValue;
 
@@ -144,10 +153,55 @@ namespace EpicGameJam
             }
         }
 
+        private void ManageGrass()
+        {
+            _currentGrassTime += Time.deltaTime;
+
+            float maxColorValue = float.MinValue;
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (maxColorValue < PlayerData.instance.ColorScores[i])
+                {
+                    maxColorValue = PlayerData.instance.ColorScores[i];
+                }
+            }
+
+            if (maxColorValue > 50)
+            {
+                if (_currentGrassTime > _nextGrassTime)
+                {
+                    _currentGrassTime = 0;
+
+                    _nextGrassTime = Random.Range(TimeBetweenGrass.x, TimeBetweenGrass.y);
+
+                    PopGrass();
+                }
+            }
+        }
+
+        private void PopGrass()
+        {
+            Grass grass = Instantiate<Grass>(Grass);
+
+            if (_nextGrassIsUpside)
+            {
+                grass.transform.position = UpsidePoint.position;
+                grass.transform.rotation = UpsidePoint.rotation;
+            }
+            else
+            {
+                grass.transform.position = DownsidePoint.position;
+                grass.transform.rotation = DownsidePoint.rotation;
+            }
+
+            _nextGrassIsUpside = Random.value > 0.5f;
+        }
+
         private void ManageColorDown()
         {
             if (_currentSequenceIndexDown < _colorSequenceCountDown
-                && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown * TimeBetweenColors)
+                && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown*TimeBetweenColors)
             {
                 int randomValue = Random.Range(0, 3);
 
@@ -164,16 +218,16 @@ namespace EpicGameJam
 
             if (distanceBetweenObstacle > 0)
             {
-                int colorMax = (int)((distanceBetweenObstacle) / TimeBetweenColors) + 1;
+                int colorMax = (int) ((distanceBetweenObstacle)/TimeBetweenColors) + 1;
 
                 if (colorMax >= ColorSequenceRange.x)
                 {
-                    int maxGeneratedColor = (int)Mathf.Min(colorMax, ColorSequenceRange.y);
+                    int maxGeneratedColor = (int) Mathf.Min(colorMax, ColorSequenceRange.y);
 
-                    _colorSequenceCountUp = Random.Range((int)ColorSequenceRange.x, maxGeneratedColor);
+                    _colorSequenceCountUp = Random.Range((int) ColorSequenceRange.x, maxGeneratedColor);
                 }
             }
-            
+
             else
             {
                 _colorSequenceCountUp = 0;
@@ -184,13 +238,13 @@ namespace EpicGameJam
         {
             _currentSequenceIndexDown = 0;
 
-            int colorMax = (int)((_nextTimeObstacleDown - 2 * TimeBetweenObstacleAndColor) / TimeBetweenColors);
+            int colorMax = (int) ((_nextTimeObstacleDown - 2*TimeBetweenObstacleAndColor)/TimeBetweenColors);
 
             if (colorMax >= ColorSequenceRange.x)
             {
-                int maxGeneratedColor = (int)Mathf.Min(colorMax, ColorSequenceRange.y);
+                int maxGeneratedColor = (int) Mathf.Min(colorMax, ColorSequenceRange.y);
 
-                _colorSequenceCountDown = Random.Range((int)ColorSequenceRange.x, maxGeneratedColor);
+                _colorSequenceCountDown = Random.Range((int) ColorSequenceRange.x, maxGeneratedColor);
             }
             else
             {
@@ -217,14 +271,16 @@ namespace EpicGameJam
                     }
                     else
                     {
-                        _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
+                        _nextTimeObstacleUp =
+                            Random.Range(_nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
                                 _nextTimeObstacleDown - _timeCountDown +
                                 (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                     }
                 }
                 else
                 {
-                    _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
+                    _nextTimeObstacleUp = Random.Range(
+                        _nextTimeObstacleDown - _timeCountDown + MinTimeObstacleOtherSide,
                         _nextTimeObstacleDown - _timeCountDown +
                         (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                 }
@@ -251,7 +307,8 @@ namespace EpicGameJam
                     }
                     else
                     {
-                        _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountUp + MinTimeObstacleOtherSide,
+                        _nextTimeObstacleDown =
+                            Random.Range(_nextTimeObstacleUp - _timeCountUp + MinTimeObstacleOtherSide,
                                 _nextTimeObstacleUp - _timeCountUp +
                                 (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                     }
@@ -259,8 +316,8 @@ namespace EpicGameJam
                 else
                 {
                     _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountUp + MinTimeObstacleOtherSide,
-                            _nextTimeObstacleUp - _timeCountUp +
-                            (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
+                        _nextTimeObstacleUp - _timeCountUp +
+                        (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
                 }
 
                 SetColorTimeDown();
@@ -310,9 +367,6 @@ namespace EpicGameJam
             colorBall.transform.rotation = position.rotation;
 
             //colorBall.SetSpeed(Speed);
-
-            
-
 
 
             colorBall.SetColor(ColorBallManager.instance.ColorList[index]);

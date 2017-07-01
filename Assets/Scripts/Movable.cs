@@ -12,7 +12,7 @@ namespace EpicGameJam
 
         protected GameObject _target = null;
 
-        private static readonly float MAX_DISTANCE = -14f;
+        private static readonly float MAX_DISTANCE = -20f;
 
         protected virtual void Awake()
         {

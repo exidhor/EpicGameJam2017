@@ -11,23 +11,42 @@ namespace EpicGameJam
     public class GameManager : MonoSingleton<GameManager>
     {
         public GameObject PanelGameOver;
+        public GameObject PanelVictory;
 
         public bool GameIsRunning = true;
 
-        public void EndGame()
+        public void EndGame(bool IsGameOver)
         {
-            if (GameIsRunning)
+            if (IsGameOver)
             {
-                GameIsRunning = false;
-                Time.timeScale = 0;
+                if (GameIsRunning)
+                {
+                    GameIsRunning = false;
+                    Time.timeScale = 0;
 
-                DisplayEndScreen();
+                    DisplayEndScreen();
+                }
+            }
+            else
+            {
+                if (GameIsRunning)
+                {
+                    GameIsRunning = false;
+                    Time.timeScale = 0;
+
+                    DisplayVictoryScreen();
+                }
             }
         }
 
         public void DisplayEndScreen()
         {
             PanelGameOver.SetActive(true);
+        }
+
+        public void DisplayVictoryScreen()
+        {
+            PanelVictory.SetActive(true);
         }
 
         public void Exit()

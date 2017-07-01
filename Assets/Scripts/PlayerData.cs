@@ -53,12 +53,13 @@ namespace EpicGameJam
             {
                 ColorScores[index] = 0;
                 
-                GameManager.instance.EndGame();
+                GameManager.instance.EndGame(true);
             }
             else if(ColorScores[index] > 100)
             {
                 ColorScores[index] = 100;
-                Debug.Log("Victory");
+
+                GameManager.instance.EndGame(false);
             }
         }
     }
