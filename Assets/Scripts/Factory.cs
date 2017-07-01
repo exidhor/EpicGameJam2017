@@ -20,55 +20,155 @@ namespace EpicGameJam
         public Obstacle Obstacle;
         public ColorBall ColorBall;
 
-        public Vector2 TimeRange;
+        //public Vector2 TimeRange;
 
-        private float _maxTime;
-        private float _currentTime = 0;
+        //private float _maxTime;
+        //private float _currentTime = 0;
 
-        public float ColorRatio;
-        public float ObstacleRatio;
+        //public float ColorRatio;
+        //public float ObstacleRatio;
+
+        public Vector2 ColorSequenceRange;
+
+        public Vector2 TimeObstacleSameSide;
+        public float MinTimeObstacleOtherSide;
+        public float TimeBetweenColors;
+
+        private float _timeCountObstacleUp = 0;
+        private float _timeCountObstacleDown = 0;
+
+        //private float _timeSinceLastObstacleUp;
+        //private float _timeSinceLastObstacleDown;
+
+        private float _nextTimeObstacleUp;
+        private float _nextTimeObstacleDown;
+
+        private int _colorSequenceCount;
+        private int _currentSequence;
 
         void Start()
         {
-
+            _nextTimeObstacleDown = 1;
+            _nextTimeObstacleUp = _nextTimeObstacleDown + MinTimeObstacleOtherSide;
         }
 
         void Update()
         {
-            _currentTime += Time.deltaTime;
+            _timeCountObstacleUp += Time.deltaTime;
+            _timeCountObstacleDown += Time.deltaTime;
 
-            if (_currentTime > _maxTime)
+            bool manageUpFirst = Random.value > 0.5f;
+
+            if (manageUpFirst)
             {
-                SetMaxTime();
-                Pop();
-                CurrentIsUpside = !CurrentIsUpside;
+                ManageObstacleUp();
+                ManageObstacleDown();
             }
+            else
+            {
+                ManageObstacleDown();
+                ManageObstacleUp();
+            }
+
+            //_currentTime += Time.deltaTime;
+
+            //if (_currentTime > _maxTime)
+            //{
+            //    SetMaxTime();
+            //    Pop();
+            //    CurrentIsUpside = !CurrentIsUpside;
+            //}
         }
 
-        private void Pop()
+        private void ManageObstacleUp()
         {
-            Transform currentPoint;
+            if (_timeCountObstacleUp > _nextTimeObstacleUp)
+            {
+                PopObstacle(UpsidePoint);
 
-            if (CurrentIsUpside)
-            {
-                currentPoint = UpsidePoint;
-            }
-            else
-            {
-                currentPoint = DownsidePoint;
-            }
+                _timeCountObstacleUp = 0;
 
-            float randomValue = Random.Range(0, ColorRatio + ObstacleRatio);
+                if (_timeCountObstacleDown + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
+                    && _nextTimeObstacleDown - _timeCountObstacleDown - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
+                {
+                    bool popBetween = Random.value > 0.5f;
 
-            if (randomValue < ColorRatio)
-            {
-                PopColorBall(currentPoint);
-            }
-            else
-            {
-                PopObstacle(currentPoint);
+                    if (popBetween)
+                    {
+                        _nextTimeObstacleUp = Random.Range(TimeObstacleSameSide.x, MinTimeObstacleOtherSide);
+                    }
+                    else
+                    {
+                        _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountObstacleDown + MinTimeObstacleOtherSide,
+                                _nextTimeObstacleDown - _timeCountObstacleDown +
+                                (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
+                    }
+                }
+                else
+                {
+                    _nextTimeObstacleUp = Random.Range(_nextTimeObstacleDown - _timeCountObstacleDown + MinTimeObstacleOtherSide,
+                        _nextTimeObstacleDown - _timeCountObstacleDown +
+                        (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
+                }
             }
         }
+
+        private void ManageObstacleDown()
+        {
+            if (_timeCountObstacleDown > _nextTimeObstacleDown)
+            {
+                PopObstacle(DownsidePoint);
+                _timeCountObstacleDown = 0;
+
+                if (_timeCountObstacleUp + TimeObstacleSameSide.x > MinTimeObstacleOtherSide
+                    && _nextTimeObstacleUp - _timeCountObstacleUp - TimeObstacleSameSide.x > MinTimeObstacleOtherSide)
+                {
+                    bool popBetween = Random.value > 0.5f;
+
+                    if (popBetween)
+                    {
+                        _nextTimeObstacleDown = Random.Range(TimeObstacleSameSide.x, MinTimeObstacleOtherSide);
+                    }
+                    else
+                    {
+                        _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountObstacleUp + MinTimeObstacleOtherSide,
+                                _nextTimeObstacleUp - _timeCountObstacleUp +
+                                (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
+                    }
+                }
+                else
+                {
+                    _nextTimeObstacleDown = Random.Range(_nextTimeObstacleUp - _timeCountObstacleUp + MinTimeObstacleOtherSide,
+                            _nextTimeObstacleUp - _timeCountObstacleUp +
+                            (TimeObstacleSameSide.y - TimeObstacleSameSide.x));
+                }
+            }
+        }
+
+        //private void Pop()
+        //{
+        //    Transform currentPoint;
+
+        //    if (CurrentIsUpside)
+        //    {
+        //        currentPoint = UpsidePoint;
+        //    }
+        //    else
+        //    {
+        //        currentPoint = DownsidePoint;
+        //    }
+
+        //    float randomValue = Random.Range(0, ColorRatio + ObstacleRatio);
+
+        //    if (randomValue < ColorRatio)
+        //    {
+        //        PopColorBall(currentPoint);
+        //    }
+        //    else
+        //    {
+        //        PopObstacle(currentPoint);
+        //    }
+        //}
 
         private void PopObstacle(Transform position)
         {
@@ -94,10 +194,10 @@ namespace EpicGameJam
             colorBall.SetColor(ColorBallManager.instance.ColorList[randomValue]);
         }
 
-        private void SetMaxTime()
-        {
-            _maxTime = Random.Range(TimeRange.x, TimeRange.y);
-            _currentTime = 0;
-        }
+        //private void SetMaxTime()
+        //{
+        //    _maxTime = Random.Range(TimeRange.x, TimeRange.y);
+        //    _currentTime = 0;
+        //}
     }
 }
