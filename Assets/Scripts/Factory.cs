@@ -14,6 +14,7 @@ namespace EpicGameJam
         public Transform DownsidePoint;
 
         public float Speed;
+        public float MaxSpeed;
 
         public float Acceleration;
 
@@ -49,10 +50,24 @@ namespace EpicGameJam
         private int _currentSequenceIndexUp;
         private int _currentSequenceIndexDown;
 
+        private float _startSpeed;
+
         void Start()
         {
             _nextTimeObstacleDown = 1;
             _nextTimeObstacleUp = _nextTimeObstacleDown + MinTimeObstacleOtherSide;
+
+            _startSpeed = Speed;
+        }
+
+        public void DecreaseSpeedOnCollision()
+        {
+            Speed /= 2;
+
+            if (Speed < _startSpeed)
+            {
+                Speed = _startSpeed;
+            }
         }
 
         void Update()
@@ -86,6 +101,11 @@ namespace EpicGameJam
         void FixedUpdate()
         {
             Speed += Acceleration*Time.fixedDeltaTime;
+
+            if (Speed > Acceleration)
+            {
+                Speed = MaxSpeed;
+            }
         }
 
         private void ManageUp()

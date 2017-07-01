@@ -41,6 +41,8 @@ namespace EpicGameJam
             {
                 AddColorScore(i, -CollisionCost);
             }
+
+            Factory.instance.DecreaseSpeedOnCollision();
         }
 
         public void AddColorScore(int index, float add)
