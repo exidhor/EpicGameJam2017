@@ -15,6 +15,8 @@ namespace EpicGameJam
 
         public float Speed;
 
+        public float Acceleration;
+
         //public bool CurrentIsUpside = false;
 
         public Obstacle Obstacle;
@@ -79,6 +81,11 @@ namespace EpicGameJam
             //    Pop();
             //    CurrentIsUpside = !CurrentIsUpside;
             //}
+        }
+
+        void FixedUpdate()
+        {
+            Speed += Acceleration*Time.fixedDeltaTime;
         }
 
         private void ManageUp()
@@ -256,7 +263,7 @@ namespace EpicGameJam
             obstacle.transform.position = position.position;
             obstacle.transform.rotation = position.rotation;
 
-            obstacle.SetSpeed(Speed);
+            //obstacle.SetSpeed(Speed);
         }
 
         private void PopColorBall(Transform position)
@@ -266,7 +273,7 @@ namespace EpicGameJam
             colorBall.transform.position = position.position;
             colorBall.transform.rotation = position.rotation;
 
-            colorBall.SetSpeed(Speed);
+            //colorBall.SetSpeed(Speed);
 
             int randomValue = Random.Range(0, 3);
 

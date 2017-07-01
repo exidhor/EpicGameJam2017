@@ -19,12 +19,12 @@ namespace EpicGameJam
             _rb = GetComponent<Rigidbody2D>();
         }
 
-        public void SetSpeed(float speed)
-        {
-            Speed = speed;
+        //public void SetSpeed(float speed)
+        //{
+        //    Speed = speed;
 
-            _rb.velocity = new Vector2(-Speed, 0);
-        }
+        //    _rb.velocity = new Vector2(-Speed, 0);
+        //}
 
         protected virtual void Update()
         {
@@ -48,6 +48,10 @@ namespace EpicGameJam
 
                     _rb.velocity = direction;
                 }
+            }
+            else
+            {
+                _rb.velocity = new Vector2(-Factory.instance.Speed, 0);
             }
         }
 
