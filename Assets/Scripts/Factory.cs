@@ -153,6 +153,27 @@ namespace EpicGameJam
             }
         }
 
+        private void ManageColorDown()
+        {
+            if (_currentSequenceIndexDown < _colorSequenceCountDown
+                && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown * TimeBetweenColors)
+            {
+                int randomValue;
+
+                if (_currentSequenceIndexDown == 0)
+                {
+                    randomValue = GetColorIndexWithConstraint();
+                }
+                else
+                {
+                    randomValue = Random.Range(0, 3);
+                }
+
+                PopColorBall(DownsidePoint, randomValue);
+                _currentSequenceIndexDown++;
+            }
+        }
+
         private void ManageGrass()
         {
             _currentGrassTime += Time.deltaTime;
@@ -198,18 +219,6 @@ namespace EpicGameJam
             _nextGrassIsUpside = Random.value > 0.5f;
         }
 
-        private void ManageColorDown()
-        {
-            if (_currentSequenceIndexDown < _colorSequenceCountDown
-                && _timeCountDown > TimeBetweenObstacleAndColor + _currentSequenceIndexDown*TimeBetweenColors)
-            {
-                int randomValue = Random.Range(0, 3);
-
-                PopColorBall(DownsidePoint, randomValue);
-                _currentSequenceIndexDown++;
-            }
-        }
-
         void SetColorTimeUp()
         {
             _currentSequenceIndexUp = 0;
@@ -227,7 +236,6 @@ namespace EpicGameJam
                     _colorSequenceCountUp = Random.Range((int) ColorSequenceRange.x, maxGeneratedColor);
                 }
             }
-
             else
             {
                 _colorSequenceCountUp = 0;
@@ -238,13 +246,18 @@ namespace EpicGameJam
         {
             _currentSequenceIndexDown = 0;
 
-            int colorMax = (int) ((_nextTimeObstacleDown - 2*TimeBetweenObstacleAndColor)/TimeBetweenColors);
+            float distanceBetweenObstacle = _nextTimeObstacleDown - 2 * TimeBetweenObstacleAndColor;
 
-            if (colorMax >= ColorSequenceRange.x)
+            if (distanceBetweenObstacle > 0)
             {
-                int maxGeneratedColor = (int) Mathf.Min(colorMax, ColorSequenceRange.y);
+                int colorMax = (int)((distanceBetweenObstacle) / TimeBetweenColors);
 
-                _colorSequenceCountDown = Random.Range((int) ColorSequenceRange.x, maxGeneratedColor);
+                if (colorMax >= ColorSequenceRange.x)
+                {
+                    int maxGeneratedColor = (int)Mathf.Min(colorMax, ColorSequenceRange.y);
+
+                    _colorSequenceCountDown = Random.Range((int)ColorSequenceRange.x, maxGeneratedColor);
+                }
             }
             else
             {

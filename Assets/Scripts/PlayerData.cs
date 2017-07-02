@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Tools;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace EpicGameJam
 {
@@ -16,6 +17,10 @@ namespace EpicGameJam
         public float CollisionCost;
 
         public List<float> ColorScores = new List<float>();
+
+        public Text ScoreText;
+
+        public float Score = 0;
 
         void Awake()
         {
@@ -33,6 +38,10 @@ namespace EpicGameJam
 
                 PaintRollerManager.instance.UpdateColorValue(i, ColorScores[i]);
             }
+
+            Score += (Factory.instance.Speed + ColorScores[0] + ColorScores[1] + ColorScores[2])/10*Time.deltaTime;
+
+            ScoreText.text = "Score : " + (int) Score;
         }
 
         public void Collision()
