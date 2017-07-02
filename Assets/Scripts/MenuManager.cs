@@ -11,6 +11,7 @@ namespace EpicGameJam
     {
         public GameObject CreditPage;
         public GameObject Home;
+        public GameObject RulesPage;
 
         public void StartGame()
         {
@@ -25,12 +26,21 @@ namespace EpicGameJam
         public void DisplayCreditsPage()
         {
             Home.SetActive(false);
+            RulesPage.SetActive(false);
             CreditPage.SetActive(true);
+        }
+
+        public void DisplayRulesPage()
+        {
+            Home.SetActive(false);
+            CreditPage.SetActive(false);
+            RulesPage.SetActive(true);
         }
 
         public void DisplayHome()
         {
             CreditPage.SetActive(false);
+            RulesPage.SetActive(false);
             Home.SetActive(true);
         }
     }
