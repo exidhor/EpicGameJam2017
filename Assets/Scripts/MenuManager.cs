@@ -9,6 +9,9 @@ namespace EpicGameJam
 {
     public class MenuManager : MonoBehaviour
     {
+        public GameObject CreditPage;
+        public GameObject Home;
+
         public void StartGame()
         {
             SceneManager.LoadScene(1);
@@ -17,6 +20,18 @@ namespace EpicGameJam
         public void ExitGame()
         {
             Application.Quit();
+        }
+
+        public void DisplayCreditsPage()
+        {
+            Home.SetActive(false);
+            CreditPage.SetActive(true);
+        }
+
+        public void DisplayHome()
+        {
+            CreditPage.SetActive(false);
+            Home.SetActive(true);
         }
     }
 }
