@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace EpicGameJam
 {  
-    [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer))]
+    [RequireComponent(typeof(Collider2D), typeof(SpriteRenderer), typeof(AudioSource))]
     public class Obstacle : Movable
     {
         public Sprite DestroySprite;
@@ -16,11 +16,17 @@ namespace EpicGameJam
 
         private SpriteRenderer _spriteRenderer;
 
+        public AudioClip HitSound;
+
+        private AudioSource _audioSource;
+
         protected override void Awake()
         { 
             base.Awake();
 
             _spriteRenderer = GetComponent<SpriteRenderer>();
+
+            _audioSource = GetComponent<AudioSource>();
         }
 
         protected override void Update()
@@ -43,6 +49,7 @@ namespace EpicGameJam
             {
                 PlayerData.instance.Collision();
 
+                _audioSource.PlayOneShot(HitSound);
                 _spriteRenderer.sprite = DestroySprite;
                 IsDisapearing = true;
             }
