@@ -22,6 +22,7 @@ namespace EpicGameJam
         public Text ScoreText;
 
         public float Score = 0;
+        public float ColorCollected = 0;
 
         void Awake()
         {
@@ -57,8 +58,13 @@ namespace EpicGameJam
             Factory.instance.DecreaseSpeedOnCollision();
         }
 
-        public void AddColorScore(int index, float add)
+        public void AddColorScore(int index, float add, bool isColorBall = false)
         {
+            if (isColorBall)
+            {
+                ColorCollected++;
+            }
+
             ColorScores[index] += add;
 
             if (ColorScores[index] < 0)

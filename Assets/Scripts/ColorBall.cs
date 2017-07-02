@@ -78,7 +78,7 @@ namespace EpicGameJam
                 if (TargetDistance > distance)
                 {
                     PaintRoller paintRoller = _target.GetComponent<PaintRoller>();
-                    PlayerData.instance.AddColorScore((int)paintRoller.ColorName, 5);
+                    PlayerData.instance.AddColorScore((int)paintRoller.ColorName, 5, true);
 
                     _rb.velocity = Vector2.zero;
 

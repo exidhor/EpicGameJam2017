@@ -72,7 +72,7 @@ namespace EpicGameJam
 
         public void DecreaseSpeedOnCollision()
         {
-            Speed /= 2;
+            Speed *= 0.75f;
 
             if (Speed < _startSpeed)
             {

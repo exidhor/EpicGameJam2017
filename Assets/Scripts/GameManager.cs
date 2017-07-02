@@ -5,13 +5,18 @@ using System.Text;
 using Tools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace EpicGameJam
 {
     public class GameManager : MonoSingleton<GameManager>
     {
         public GameObject PanelGameOver;
-        public GameObject PanelVictory;
+        //public GameObject PanelVictory;
+
+        public Text Title;
+        public Text Score;
+        public Text ColorCollected;
 
         public bool GameIsRunning = true;
 
@@ -41,12 +46,20 @@ namespace EpicGameJam
 
         public void DisplayEndScreen()
         {
+            Title.text = "GAME OVER";
+            Score.text = "Score : " + (int) PlayerData.instance.Score;
+            ColorCollected.text = "Color Collected : " + (int) PlayerData.instance.ColorCollected;
+
             PanelGameOver.SetActive(true);
         }
 
         public void DisplayVictoryScreen()
         {
-            PanelVictory.SetActive(true);
+            Title.text = "VICTORY";
+            Score.text = "Score : " + (int)PlayerData.instance.Score;
+            ColorCollected.text = "Color Collected : " + (int)PlayerData.instance.ColorCollected;
+
+            PanelGameOver.SetActive(true);
         }
 
         public void Exit()
