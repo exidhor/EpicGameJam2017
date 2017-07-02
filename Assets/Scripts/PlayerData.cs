@@ -11,6 +11,7 @@ namespace EpicGameJam
     public class PlayerData : MonoSingleton<PlayerData>
     {
         public float DecreaseValue;
+        public float CoefDecreaseValue;
 
         public float StartValue = 10f;
 
@@ -32,6 +33,8 @@ namespace EpicGameJam
 
         void Update()
         {
+            DecreaseValue = Factory.instance.Speed/CoefDecreaseValue;
+
             for (int i = 0; i < 3; i++)
             {
                 AddColorScore(i, -DecreaseValue * Time.deltaTime);
