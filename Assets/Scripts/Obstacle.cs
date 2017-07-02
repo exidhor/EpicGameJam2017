@@ -39,7 +39,7 @@ namespace EpicGameJam
 
         void OnTriggerEnter2D(Collider2D collider)
         {
-            if (collider.tag == "Player")
+            if (collider.tag == "Player" && !IsDisapearing)
             {
                 PlayerData.instance.Collision();
 

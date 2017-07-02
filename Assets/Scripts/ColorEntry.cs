@@ -11,5 +11,6 @@ namespace EpicGameJam
     {
         public EColor ColorName;
         public Color Color;
+        public Sprite ColorBallSprite;
     }
 }

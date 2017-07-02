@@ -8,6 +8,8 @@ namespace EpicGameJam
         private SpriteRenderer _spriteRender;
         public EColor ColorName;
 
+        public float ColorScore;
+
         public bool StartDisapear;
         public float DisapearSpeed;
 
@@ -22,7 +24,7 @@ namespace EpicGameJam
 
         public void SetColor(ColorEntry colorEntry)
         {
-            _spriteRender.color = colorEntry.Color;
+            _spriteRender.sprite = colorEntry.ColorBallSprite;
             ColorName = colorEntry.ColorName;
         }
 
@@ -78,7 +80,7 @@ namespace EpicGameJam
                 if (TargetDistance > distance)
                 {
                     PaintRoller paintRoller = _target.GetComponent<PaintRoller>();
-                    PlayerData.instance.AddColorScore((int)paintRoller.ColorName, 5, true);
+                    PlayerData.instance.AddColorScore((int)paintRoller.ColorName, ColorScore, true);
 
                     _rb.velocity = Vector2.zero;
 
